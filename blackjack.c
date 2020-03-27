@@ -21,13 +21,13 @@ struct plca player[8];
 			
 int pitch[pit];
 int mixed[pit] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int j=0, cardnum, cardclass;
+int j=0, cardnum, cardclass, flag;
 
 void append ();
 void mix ();
 void drawbeg ();
-void addc ();
 void output();
+void addc (int z, int y);
 void decision ();
 void draw();
 
@@ -35,7 +35,7 @@ int main(){
 	
 }
 
-void append(){
+void append(){ //appends two decks for pitch game.
 	int x;
 	for (x=0; x<pit; x++){
 		if (x<52){
@@ -47,7 +47,7 @@ void append(){
 	}
 }
 
-void mix (){
+void mix (){ //mixes the deck.
 	int i, random;
 	srand(time(0));
 	for (i=0; i<pit; i++){
@@ -62,7 +62,7 @@ void mix (){
 	}
 }
 
-void drawbeg (){
+void drawbeg (){ //deals the cards at the beginning.
 	int i, k;
 	for (k=0; k<2; k++){
 		for (i=0; i<16; i++){
@@ -72,31 +72,26 @@ void drawbeg (){
 	}
 }
 
-void addc (){
-	int l, p;
-	for (p=0; p<8; p++){
-		for (l=0; l<15; l++){
-			player[p].total=0;
-			player[p].total+=player[p].cards[l];
-		}	
-	}
-}
-
 void output(){
 	int q, y, z;
-	for (z=0; z<8; z++){
+	for (z=0; z<8; z++){ //repeats everything for 7 players and the dealer.
 		y=0;
 		do{
 			cardnum=player[z].cards[y]%13;
 			if (cardnum==0){
 				cardnum=13;
 			}
-			cardclass=(player[z].cards[y]/13)+1;
+			cardclass=(player[z].cards[y]/13)+1; //finds the card class.
 			y++;
-		}while (player[z].cards[y]!=NULL);
+			
+			addc(z,y);
+			
+		}while (player[z].cards[y]!=NULL); //finds the card number until the element of the structure comes up with the value "NULL".
 		
 		printf ("Number %d's cards are ", z);
-		for (q=0; q<y; q++){
+		for (q=0; q<y; q++){ //repeats everything for each card.
+			
+			//finds and prints the card number.
 			if (cardnum==1){
 				printf ("A ");
 			}
@@ -110,10 +105,12 @@ void output(){
 				printf ("K ");
 			}
 			else{
-				printf ("%d ", cardnum);
+				printf ("%d ", cardnum); 
 			}
 			
-			if (cardclass==1){
+			
+			//prints the card class.
+			if (cardclass==1){ 
 				printf ("club");
 			}
 			else if (cardclass==2){
@@ -125,17 +122,45 @@ void output(){
 			else if (cardclass==4){
 				printf ("heart");
 			}
-			if ((y!=2)&&(q!=y-1)){
+			
+			
+			//helps printing the cards with the right sentence structure.
+			if ((y!=2)&&(q!=y-1)){ 
 				printf (", ");
 			}
-			else if ((y==2)&&(q==y-2)){
+			else if ((y==2)&&(q==0)){
 				printf (" and ");
 			}
+			else if ((y!=2)&&(q==y-1)){
+				printf (" and ");
+			}
+			
 		}
 		
+
+			
+		}
 		
 	}
 
+}
+
+void addc(int z, int y){ //adds the values of cards.
+	int i;
+	flag=0;
+	player[z].total=0;
+	for (i=0; i<y; i++){
+		if ((cardnum==10)||(cardnum==11)||(cardnum==12)||(cardnum==13)){ //if the card number is 10 or the card is a noble card, the card's value becomes 10.
+			player[z].total+=10;
+		}
+		else if ((cardnum!=1)||((cardnum==1)&&(player[z].total>10))){ //if the card is not an ace OR is an ace and total value of the cards are greater than 10, the card's value becomes its number.
+			player[z].total+=cardnum;
+		}
+		else{ //if the card is an ace and the total value is less than 11, the card's value becomes 11.
+			player[z].total+=11;
+			flag=1;
+		}
+	}
 }
 
 void decision(){
