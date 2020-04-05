@@ -17,6 +17,7 @@ struct plca{
 	int cards[15];
 	int total;
 	int bet;
+	int lost;
 	int aofc;
 	int cardnum[15];
 	int cardclass[15];
@@ -26,6 +27,8 @@ struct plca player[8];
 int pitch[pit];
 int mixed[pit] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int j=0, acekeeper=0;
+int splitter[7];
+int loser[8];
 
 void append ();
 void mix ();
@@ -35,6 +38,9 @@ void output();
 void addc (int z, int y);
 void decision (int z);
 void draw(int a);
+void lose();
+
+
 
 int main(){
 	
@@ -87,7 +93,7 @@ void output(){
 	for (z=0; z<8; z++){ //repeats everything for 7 players and the dealer.
 		y=0;
 		do{
-			player[z].cardnum[y ]=player[z].cards[y]%13;
+			player[z].cardnum[y]=player[z].cards[y]%13;
 			if (player[z].cardnum[y]==0){
 				player[z].cardnum[y]=13;
 			}
@@ -161,7 +167,7 @@ void output(){
 		
 	}
 
-}
+
 
 void addc(int z, int y){ //adds the values of cards.
 	int i;
@@ -169,11 +175,11 @@ void addc(int z, int y){ //adds the values of cards.
 	player[z].total=0;
 	
 	for (i=0; i<y; i++){
-		if ((player[z].cardnum==10)||(player[z].cardnum==11)||(player[z].cardnum==12)||(player[z].cardnum==13)){ //if the card number is 10 or the card is a noble card, the card's value becomes 10.
+		if ((player[z].cardnum[i]==10)||(player[z].cardnum[i]==11)||(player[z].cardnum[i]==12)||(player[z].cardnum[i]==13)){ //if the card number is 10 or the card is a noble card, the card's value becomes 10.
 			player[z].total+=10;
 		}
-		else if (player[z].cardnum!=1){ //if the card is not an ace, the card's value becomes its number.
-			player[z].total+=cardnum;
+		else if (player[z].cardnum[i]!=1){ //if the card is not an ace, the card's value becomes its number.
+			player[z].total+=player[z].cardnum[i];
 		}
 		else{ //if the card is an ace, acekeeper variable increases by one. ace value is taken as one.
 			acekeeper++;
@@ -187,24 +193,24 @@ void decision(int z){
 	dec:
 	printf ("\nPlayer %d, make your decision.\n", z);
 	printf ("\n1-Hit\n2-Stand\n3-Double Down\n4-Split Pair\n5-Insurance\n6-Surrender\n");
-	scanf ("%d", &dec);
+	scanf ("%d", &decis);
 	switch (decis){
 		case 1: draw(z);
 				flag=1;
 				goto dec;
+				break;
 		case 2: break;
 		case 3: player[z].bet*=2;
 				draw(z);
 				flag=1;
-				goto dec;
 				break;
-		case 4: printf ("Player %d, update your bet.\n", z);
+	/*	case 4: printf ("Player %d, update your bet.\n", z);
 				makebet(z);
 				draw(z);
 				draw(z);
 				flag=1
 				goto dec;
-				break;		
+				break;		*/
 		case 5: player[z].bet/=2;
 				flag=1
 				break;
@@ -223,5 +229,21 @@ void draw(int a){
 	player[a].aofc++;
 }
 
+void lose(){
+	int i=0;
+	while (i!=8){
+		if (player[8].total<22){
+			if(player[i].total<player[8].total){
+				loser[i]=1;
+				player[i].lost=player[i].bet;
+			}
+		}
+		else{
+			
+		}
+		
+		i++;
+	}
+}
 
 
